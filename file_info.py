@@ -4,4 +4,4 @@ class FileInfo:
         self.path = path
 
     def __str__(self):
-        return f"{self.size:<20} {self.path}\n"
+        return f"{self.size:<20} {self.path}"
