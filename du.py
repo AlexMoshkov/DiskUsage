@@ -11,17 +11,19 @@ class DiskUsage:
 
         if summarize:
             size = self.get_size(path)
-            return [FileInfo(size, path)]
+            return [FileInfo(size, path, 0)]
 
-        for dirpath, dirs, files in os.walk(path):
+        for root, dirs, files in os.walk(path):
+            depth = root.replace(path, '').count(os.sep)
+            size = self.get_size(root)
+            result.append(FileInfo(size, os.path.relpath(root, path), depth))
+
             if all:
                 for file in files:
-                    file_path = os.path.join(dirpath, file)
+                    file_path = os.path.join(root, file)
+                    file_depth = file_path.replace(path, '').count(os.sep)
                     file_size = os.path.getsize(file_path)
-                    result.append(FileInfo(file_size, file_path))
-
-            size = self.get_size(dirpath)
-            result.append(FileInfo(size, dirpath))
+                    result.append(FileInfo(file_size, os.path.relpath(file_path, path), file_depth))
         return result[::-1]
 
     def get_size(self, start_path='.'):
@@ -35,9 +37,3 @@ class DiskUsage:
 
     def check_path(self, path):
         pass
-
-
-if __name__ == '__main__':
-    du = DiskUsage()
-    result = du.get_dirs_info("C:\Games\Cyberpunk.2077.GOG.Rip-InsaneRamZes", summarize=True)
-    print(*result)
