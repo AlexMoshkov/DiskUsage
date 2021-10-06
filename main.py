@@ -1,6 +1,5 @@
 import argparse
 from du import DiskUsage
-from viewer import view
 
 
 def main():
@@ -14,8 +13,8 @@ def main():
 
     args = arg_parser.parse_args()
 
-    result = DiskUsage().get_dirs_info(args.path, all=args.all, summarize=args.summarize)
-    view(result, measure=args.measure)
+    dirs_tree = DiskUsage(args.path).get_dirs_tree()
+    dirs_tree.list_view()
 
 
 if __name__ == '__main__':

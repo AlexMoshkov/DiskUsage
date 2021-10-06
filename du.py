@@ -1,32 +1,32 @@
 import os
-from file_info import FileInfo
+from file import FileInfo
+from directory import Directory
 
 
 class DiskUsage:
-    def get_dirs_info(self, path, all=False, summarize=False):
-        result = []
+    def __init__(self, path):
+        self.root = path
 
-        if self.check_path(path):
-            pass
+    def get_dirs_tree(self):
+        size = self._get_size(self.root)
+        root_dir = Directory(self.root, size, [], [], 0)
+        self._get_subdirs(root_dir, 0)
+        return root_dir
 
-        if summarize:
-            size = self.get_size(path)
-            return [FileInfo(size, path, 0)]
+    def _get_subdirs(self, dir, depth, all=False, summarize=False):
+        contents = os.listdir(dir.path)
+        for content in contents:
+            sub_path = os.path.join(dir.path, content)
+            sub_size = self._get_size(sub_path)
+            if os.path.isdir(sub_path):
+                subdir = Directory(sub_path, sub_size, [], [], depth + 1)
+                self._get_subdirs(subdir, all, summarize)
+                dir.subdirs.append(subdir)
+            else:
+                file = FileInfo(sub_path, sub_size, depth + 1)
+                dir.files.append(file)
 
-        for root, dirs, files in os.walk(path):
-            depth = root.replace(path, '').count(os.sep)
-            size = self.get_size(root)
-            result.append(FileInfo(size, os.path.relpath(root, path), depth))
-
-            if all:
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    file_depth = file_path.replace(path, '').count(os.sep)
-                    file_size = os.path.getsize(file_path)
-                    result.append(FileInfo(file_size, os.path.relpath(file_path, path), file_depth))
-        return result[::-1]
-
-    def get_size(self, start_path='.'):
+    def _get_size(self, start_path='.'):
         total_size = 0
         for dirpath, dirs, files in os.walk(start_path):
             for filename in files:
@@ -35,5 +35,5 @@ class DiskUsage:
                     total_size += os.path.getsize(file_path)
         return total_size
 
-    def check_path(self, path):
+    def _check_path(self, path):
         pass
