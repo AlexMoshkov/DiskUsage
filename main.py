@@ -14,7 +14,11 @@ def main():
     args = arg_parser.parse_args()
 
     dirs_tree = DiskUsage(args.path).get_dirs_tree()
-    dirs_tree.list_view()
+
+    if args.beautiful:
+        dirs_tree.tree_view(all=args.all, summarize=args.summarize, measure=args.measure)
+    else:
+        dirs_tree.list_view(all=args.all, summarize=args.summarize, measure=args.measure)
 
 
 if __name__ == '__main__':

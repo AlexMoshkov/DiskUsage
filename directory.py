@@ -1,4 +1,3 @@
-import os
 from humanize import naturalsize
 
 
@@ -15,16 +14,25 @@ class Directory:
         for subdir in self.subdirs:
             yield from subdir.walk()
 
-    def list_view(self, all=False, summarize=False):
+    def list_view(self, all=False, summarize=False, measure=False):
+        if summarize:
+            self.print(measure=measure)
+            return
         reversed_walk = list(self.walk())[::-1]
         for dir in reversed_walk:
-            print(dir)
+            dir.print(measure=measure)
+            if all:
+                for file in dir.files:
+                    file.print(measure=measure)
 
-    def tree_view(self, all=False):
+    def tree_view(self, all=False, summarize=False):
         pass
 
-    def __str__(self):
-        return f"{self.size:<40} {self.path}"
+    def print(self, measure=False):
+        size = self.size
+        if measure:
+            size = naturalsize(self.size)
+        print(f"{size:<20} {self.path}")
 
 
 # TODO: геттер для dir_name

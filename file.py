@@ -7,8 +7,11 @@ class FileInfo:
         self.size = size
         self.depth = depth
 
-    def __str__(self):
-        return f"{self.size:<20} {self.path} {self.depth}"
+    def print(self, measure=False):
+        size = self.size
+        if measure:
+            size = naturalsize(size)
+        print(f"{size:<20} {self.path}")
 
     def get_normalize_size(self):
         return naturalsize(self.size)
