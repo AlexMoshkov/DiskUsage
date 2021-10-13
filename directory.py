@@ -1,5 +1,5 @@
 from humanize import naturalsize
-
+import os
 
 class Directory:
     def __init__(self, path, size, subdirs, files, depth):
@@ -25,8 +25,26 @@ class Directory:
                 for file in dir.files:
                     file.print(measure=measure)
 
-    def tree_view(self, all=False, summarize=False):
-        pass
+    def tree_view(self, all=False, summarize=False, measure=False):
+        space = '    '
+        branch = '│   '
+        tee = '├── '
+        last = '└── '
+
+        def tree_lines(dir, prefix=''):
+            contents = dir.subdirs
+            if all:
+                contents += dir.files
+            pointers = [tee] * (len(contents) - 1) + [last]
+            for pointer, content in zip(pointers, contents):
+                size = str(naturalsize(self.size) if measure else self.size)
+                yield f"{prefix}{pointer}[{size}] {os.path.basename(content.path)}"
+                if isinstance(content, Directory):
+                    extension = branch if pointer == tee else space
+                    yield from tree_lines(content, prefix=prefix + extension)
+
+        for line in tree_lines(self):
+            print(line)
 
     def print(self, measure=False):
         size = self.size
