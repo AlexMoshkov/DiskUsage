@@ -1,6 +1,7 @@
 from humanize import naturalsize
 import os
 
+
 class Directory:
     def __init__(self, path, size, subdirs, files, depth):
         self.path = path
