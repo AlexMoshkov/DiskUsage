@@ -42,7 +42,7 @@ class Directory:
             pointers = [tee] * (len(contents) - 1) + [last]
             for pointer, content in zip(pointers, contents):
                 size = str(naturalsize(self.size) if measure else self.size)
-                yield f"{prefix}{pointer}[{size}] {self.dir_name}"
+                yield f"{prefix}{pointer}[{size}] {self.name}"
                 if isinstance(content, Directory):
                     extension = branch if pointer == tee else space
                     yield from tree_lines(content, prefix=prefix + extension)
