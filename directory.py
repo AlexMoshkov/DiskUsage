@@ -9,6 +9,10 @@ class Directory:
         self.files = files
         self.depth = depth
 
+    @property
+    def name(self):
+        return os.path.basename(self.path)
+
     def walk(self):
         yield self
         for subdir in self.subdirs:
@@ -38,7 +42,7 @@ class Directory:
             pointers = [tee] * (len(contents) - 1) + [last]
             for pointer, content in zip(pointers, contents):
                 size = str(naturalsize(self.size) if measure else self.size)
-                yield f"{prefix}{pointer}[{size}] {os.path.basename(content.path)}"
+                yield f"{prefix}{pointer}[{size}] {self.dir_name}"
                 if isinstance(content, Directory):
                     extension = branch if pointer == tee else space
                     yield from tree_lines(content, prefix=prefix + extension)
@@ -53,5 +57,4 @@ class Directory:
         print(f"{size:<20} {self.path}")
 
 
-# TODO: геттер для dir_name
 # TODO: реализовать возможность игнора скрытых директорий и файлов

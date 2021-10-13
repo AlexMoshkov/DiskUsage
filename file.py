@@ -1,4 +1,5 @@
 from humanize import naturalsize
+import os
 
 
 class FileInfo:
@@ -6,6 +7,10 @@ class FileInfo:
         self.path = path
         self.size = size
         self.depth = depth
+
+    @property
+    def name(self):
+        return os.path.basename(self.path)
 
     def print(self, measure=False):
         size = self.size
