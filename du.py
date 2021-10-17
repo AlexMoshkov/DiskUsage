@@ -17,12 +17,14 @@ class DiskUsage:
         contents = os.listdir(dir.path)
         for content in contents:
             sub_path = os.path.join(dir.path, content)
-            sub_size = self._get_size(sub_path)
+
             if os.path.isdir(sub_path):
+                sub_size = self._get_size(sub_path)
                 subdir = Directory(sub_path, sub_size, [], [], depth + 1)
-                self._get_subdirs(subdir, all, summarize)
+                self._get_subdirs(subdir, depth + 1, all=all, summarize=summarize)
                 dir.subdirs.append(subdir)
             else:
+                sub_size = os.path.getsize(sub_path)
                 file = FileInfo(sub_path, sub_size, depth + 1)
                 dir.files.append(file)
 

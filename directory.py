@@ -19,18 +19,21 @@ class Directory:
         for subdir in self.subdirs:
             yield from subdir.walk()
 
-    def list_view(self, all=False, summarize=False, measure=False):
+    def list_view(self, all=False, summarize=False, measure=False, depth=None):
+        print(depth)
         if summarize:
             self.print(measure=measure)
             return
         reversed_walk = list(self.walk())[::-1]
         for dir in reversed_walk:
-            dir.print(measure=measure)
+            if depth is None or dir.depth <= depth:
+                dir.print(measure=measure)
             if all:
                 for file in dir.files:
-                    file.print(measure=measure)
+                    if depth is None or file.depth <= depth:
+                        file.print(measure=measure)
 
-    def tree_view(self, all=False, summarize=False, measure=False):
+    def tree_view(self, all=False, summarize=False, measure=False, depth=None):
         space = '    '
         branch = '│   '
         tee = '├── '
@@ -42,12 +45,13 @@ class Directory:
                 contents += dir.files
             pointers = [tee] * (len(contents) - 1) + [last]
             for pointer, content in zip(pointers, contents):
-                size = str(naturalsize(self.size) if measure else self.size)
+                size = str(naturalsize(content.size) if measure else content.size)
                 yield f"{prefix}{pointer}[{size}] {content.name}"
                 if isinstance(content, Directory):
                     extension = branch if pointer == tee else space
-                    yield from tree_lines(content, prefix=prefix + extension)
-
+                    if depth is None or content.depth < depth:
+                        yield from tree_lines(content, prefix=prefix + extension)
+        print(f"[{naturalsize(self.size) if measure else self.size}]")
         for line in tree_lines(self):
             print(line)
 
