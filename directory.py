@@ -14,26 +14,26 @@ class Directory:
     def name(self):
         return os.path.basename(self.path)
 
-    def walk(self):
+    def walk(self, all=False):
         yield self
+        if all:
+            for file in self.files:
+                yield file
         for subdir in self.subdirs:
-            yield from subdir.walk()
+            yield from subdir.walk(all=all)
 
-    def list_view(self, all=False, summarize=False, measure=False, depth=None):
+    def list_view(self, all=False, summarize=False, measure=False, depth=None, fullpath=False):
+        root = None if fullpath else self.path
         print(depth)
         if summarize:
             self.print(measure=measure)
             return
-        reversed_walk = list(self.walk())[::-1]
-        for dir in reversed_walk:
-            if depth is None or dir.depth <= depth:
-                dir.print(measure=measure)
-            if all:
-                for file in dir.files:
-                    if depth is None or file.depth <= depth:
-                        file.print(measure=measure)
+        reversed_walk = list(self.walk(all=all))[::-1]
+        for obj in reversed_walk:
+            if depth is None or obj.depth <= depth:
+                obj.print(measure=measure, root_path=root)
 
-    def tree_view(self, all=False, summarize=False, measure=False, depth=None):
+    def tree_view(self, all=False, summarize=False, measure=False, depth=None, fullpath=False):
         space = '    '
         branch = '│   '
         tee = '├── '
@@ -46,7 +46,8 @@ class Directory:
             pointers = [tee] * (len(contents) - 1) + [last]
             for pointer, content in zip(pointers, contents):
                 size = str(naturalsize(content.size) if measure else content.size)
-                yield f"{prefix}{pointer}[{size}] {content.name}"
+                content_name = content.path if fullpath else content.name
+                yield f"{prefix}{pointer}[{size}] {content_name}"
                 if isinstance(content, Directory):
                     extension = branch if pointer == tee else space
                     if depth is None or content.depth < depth:
@@ -55,11 +56,10 @@ class Directory:
         for line in tree_lines(self):
             print(line)
 
-    def print(self, measure=False):
-        size = self.size
-        if measure:
-            size = naturalsize(self.size)
-        print(f"{size:<20} {self.path}")
+    def print(self, measure=False, root_path=None):
+        size = naturalsize(self.size) if measure else self.size
+        path = self.path if root_path is None else os.path.relpath(self.path, root_path)
+        print(f"{size:<20} {path}")
 
 
 # TODO: реализовать возможность игнора скрытых директорий и файлов
