@@ -22,14 +22,22 @@ class Directory:
         for subdir in self.subdirs:
             yield from subdir.walk(all=all)
 
-    def list_view(self, all=False, summarize=False, measure=False, depth=None, fullpath=False):
+    def files_walk(self):
+        for file in self.files:
+            yield file
+        for subdir in self.subdirs:
+            yield from subdir.files_walk()
+
+    def list_view(self, all=False, summarize=False, measure=False, depth=None, fullpath=False, max_count=None):
         root = None if fullpath else self.path
-        print(depth)
         if summarize:
             self.print(measure=measure)
             return
-        reversed_walk = list(self.walk(all=all))[::-1]
-        for obj in reversed_walk:
+        if max_count is None:
+            walk = list(self.walk(all=all))[::-1]
+        else:
+            walk = self.get_max_objects(max_count, files=all)
+        for obj in walk:
             if depth is None or obj.depth <= depth:
                 obj.print(measure=measure, root_path=root)
 
@@ -53,8 +61,16 @@ class Directory:
                     if depth is None or content.depth < depth:
                         yield from tree_lines(content, prefix=prefix + extension)
         print(f"[{naturalsize(self.size) if measure else self.size}]")
-        for line in tree_lines(self):
-            print(line)
+        if not summarize:
+            for line in tree_lines(self):
+                print(line)
+
+    def get_max_objects(self, count, files=False):
+        array = list(filter(lambda x: len(x.subdirs) == 0, self.walk()))
+        if files:
+            array = list(self.files_walk())
+        array.sort(key=lambda x: x.size, reverse=True)
+        return array[:count]
 
     def print(self, measure=False, root_path=None):
         size = naturalsize(self.size) if measure else self.size

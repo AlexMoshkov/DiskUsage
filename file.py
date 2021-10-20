@@ -17,5 +17,3 @@ class FileInfo:
         path = self.path if root_path is None else os.path.relpath(self.path, root_path)
         print(f"{size:<20} {path}")
 
-    def get_normalize_size(self):
-        return naturalsize(self.size)

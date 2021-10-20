@@ -39,3 +39,4 @@ class DiskUsage:
 
     def _check_path(self, path):
         pass
+

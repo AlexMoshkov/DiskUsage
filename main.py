@@ -10,18 +10,22 @@ def main():
     arg_parser.add_argument('-s', '--summarize', action='store_true', help='')
     arg_parser.add_argument('-m', '--measure', action='store_true', help='')
     arg_parser.add_argument('-t', '--tree', action='store_true', help='')
-    arg_parser.add_argument('-d', '--depth', nargs=1, type=int,
-                            required=False, metavar=('depth',), help='', default=[None])
+    arg_parser.add_argument('-d', '--depth', nargs=1, type=int, required=False, metavar=('depth',), default=[None],
+                            help='')
     arg_parser.add_argument('-f', '--fullpath', action='store_true', help='')
+    arg_parser.add_argument('-g', '--maxsize', nargs=1, type=int, required=False, metavar=('count',), default=[None],
+                            help='')
 
     args = arg_parser.parse_args()
 
     dirs_tree = DiskUsage(args.path).get_dirs_tree()
 
-    if args.tree:
-        dirs_tree.tree_view(all=args.all, summarize=args.summarize, measure=args.measure, depth=args.depth[0], fullpath=args.fullpath)
+    if args.tree and args.maxsize[0] is None:
+        dirs_tree.tree_view(all=args.all, summarize=args.summarize, measure=args.measure, depth=args.depth[0],
+                            fullpath=args.fullpath)
     else:
-        dirs_tree.list_view(all=args.all, summarize=args.summarize, measure=args.measure, depth=args.depth[0], fullpath=args.fullpath)
+        dirs_tree.list_view(all=args.all, summarize=args.summarize, measure=args.measure, depth=args.depth[0],
+                            fullpath=args.fullpath, max_count=args.maxsize[0])
 
 
 if __name__ == '__main__':
