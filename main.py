@@ -1,5 +1,6 @@
 import argparse
 from du import DiskUsage
+from view import list_view, tree_view
 
 
 def main():
@@ -21,11 +22,11 @@ def main():
     dirs_tree = DiskUsage(args.path).get_dirs_tree()
 
     if args.tree and args.maxsize[0] is None:
-        dirs_tree.tree_view(all=args.all, summarize=args.summarize, measure=args.measure, depth=args.depth[0],
-                            fullpath=args.fullpath)
+        tree_view(dirs_tree, all=args.all, summarize=args.summarize, measure=args.measure, depth=args.depth[0],
+                  fullpath=args.fullpath)
     else:
-        dirs_tree.list_view(all=args.all, summarize=args.summarize, measure=args.measure, depth=args.depth[0],
-                            fullpath=args.fullpath, max_count=args.maxsize[0])
+        list_view(dirs_tree, all=args.all, summarize=args.summarize, measure=args.measure, depth=args.depth[0],
+                  fullpath=args.fullpath, max_count=args.maxsize[0])
 
 
 if __name__ == '__main__':

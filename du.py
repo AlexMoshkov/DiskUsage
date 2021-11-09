@@ -1,6 +1,6 @@
 import os
 from file import FileInfo
-from directory import Directory
+from directory import DirectoryInfo
 
 
 class DiskUsage:
@@ -9,7 +9,7 @@ class DiskUsage:
 
     def get_dirs_tree(self):
         size = self._get_size(self.root)
-        root_dir = Directory(self.root, size, [], [], 0)
+        root_dir = DirectoryInfo(self.root, size, [], [], 0)
         self._get_subdirs(root_dir, 0)
         return root_dir
 
@@ -20,7 +20,7 @@ class DiskUsage:
 
             if os.path.isdir(sub_path):
                 sub_size = self._get_size(sub_path)
-                subdir = Directory(sub_path, sub_size, [], [], depth + 1)
+                subdir = DirectoryInfo(sub_path, sub_size, [], [], depth + 1)
                 self._get_subdirs(subdir, depth + 1, all=all, summarize=summarize)
                 dir.subdirs.append(subdir)
             else:
