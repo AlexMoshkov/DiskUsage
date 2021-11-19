@@ -16,6 +16,7 @@ def main():
     arg_parser.add_argument('-f', '--fullpath', action='store_true', help='')
     arg_parser.add_argument('-g', '--maxsize', nargs=1, type=int, required=False, metavar=('count',), default=[None],
                             help='')
+    arg_parser.add_argument('-w', '--window', action='store_true', required=False, help='')
 
     args = arg_parser.parse_args()
 
@@ -23,14 +24,11 @@ def main():
 
     if args.tree and args.maxsize[0] is None:
         tree_view(dirs_tree, all=args.all, summarize=args.summarize, measure=args.measure, depth=args.depth[0],
-                  fullpath=args.fullpath)
+                  fullpath=args.fullpath, window=args.window)
     else:
         list_view(dirs_tree, all=args.all, summarize=args.summarize, measure=args.measure, depth=args.depth[0],
-                  fullpath=args.fullpath, max_count=args.maxsize[0])
+                  fullpath=args.fullpath, max_count=args.maxsize[0], window=args.window)
 
 
 if __name__ == '__main__':
     main()
-
-# TODO: сделать ключ -m <число> для отображения самых жирных директорий (которые не имеют поддиректорий) (при ключе -a файлов)
-# TODO: сделать ключ -w для отображения в окне типо как в виме

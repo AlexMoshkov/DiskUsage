@@ -1,8 +1,9 @@
 from humanize import naturalsize
 from directory import DirectoryInfo
+from screen import Screen
 
 
-def list_view(dir, all=False, summarize=False, measure=False, depth=None, fullpath=False, max_count=None):
+def list_view(dir, all=False, summarize=False, measure=False, depth=None, fullpath=False, max_count=None, window=False):
     root = None if fullpath else dir.path
     if summarize:
         dir.print(measure=measure)
@@ -13,12 +14,20 @@ def list_view(dir, all=False, summarize=False, measure=False, depth=None, fullpa
     else:
         walk = dir.get_max_objects(max_count, files=all)
 
-    for obj in walk:
-        if depth is None or obj.depth <= depth:
-            obj.print(measure=measure, root_path=root)
+    if depth is not None:
+        walk = filter(lambda x: x <= depth, walk)
+
+    lines = [obj.str(measure=measure, root_path=root) for obj in walk]
+
+    if window:
+        win = Screen(lines[::-1])
+        win.run()
+    else:
+        for line in lines:
+            print(line)
 
 
-def tree_view(dir, all=False, summarize=False, measure=False, depth=None, fullpath=False):
+def tree_view(dir, all=False, summarize=False, measure=False, depth=None, fullpath=False, window=False):
     space = '    '
     branch = '│   '
     tee = '├── '
@@ -37,7 +46,14 @@ def tree_view(dir, all=False, summarize=False, measure=False, depth=None, fullpa
                 extension = branch if pointer == tee else space
                 if depth is None or content.depth < depth:
                     yield from tree_lines(content, prefix=prefix + extension)
-    print(f"[{naturalsize(dir.size) if measure else dir.size}]")
+
+    lines = [f"[{naturalsize(dir.size) if measure else dir.size}]"]
     if not summarize:
-        for line in tree_lines(dir):
+        lines += tree_lines(dir)
+
+    if window:
+        win = Screen(lines)
+        win.run()
+    else:
+        for line in lines:
             print(line)

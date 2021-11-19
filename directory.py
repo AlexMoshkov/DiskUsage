@@ -29,13 +29,14 @@ class DirectoryInfo:
             yield from subdir.files_walk()
 
     def get_max_objects(self, count, files=False):
-        array = list(filter(lambda x: len(x.subdirs) == 0, self.walk()))
         if files:
             array = list(self.files_walk())
+        else:
+            array = list(filter(lambda x: len(x.subdirs) == 0, self.walk()))
         array.sort(key=lambda x: x.size, reverse=True)
         return array[:count]
 
-    def print(self, measure=False, root_path=None):
+    def str(self, measure=False, root_path=None):
         size = naturalsize(self.size) if measure else self.size
         path = self.path if root_path is None else os.path.relpath(self.path, root_path)
-        print(f"{size:<20} {path}")
+        return f"{size:<20} {path}"
