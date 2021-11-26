@@ -5,20 +5,17 @@ from screen import Screen
 
 def list_view(dir, all=False, summarize=False, measure=False, depth=None, fullpath=False, max_count=None, window=False):
     root = None if fullpath else dir.path
-    if summarize:
-        dir.print(measure=measure)
-        return
-
     if max_count is None:
-        walk = list(dir.walk(all=all))[::-1]
+        if summarize:
+            walk = [dir]
+        else:
+            walk = list(dir.walk(all=all))[::-1]
     else:
         walk = dir.get_max_objects(max_count, files=all)
-
     if depth is not None:
-        walk = filter(lambda x: x <= depth, walk)
+        walk = filter(lambda x: x.depth <= depth, walk)
 
     lines = [obj.str(measure=measure, root_path=root) for obj in walk]
-
     if window:
         win = Screen(lines[::-1])
         win.run()
